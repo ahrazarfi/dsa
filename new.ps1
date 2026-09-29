@@ -1,4 +1,4 @@
-# Scaffold a new DSA problem folder and open it in VS Code (Windows counterpart of new.sh).
+# Scaffold a new DSA problem folder in the current directory and open it in VS Code (Windows counterpart of new.sh).
 # Usage: new.ps1 [problem-name]   (prompts if no name is given)
 param([Parameter(ValueFromRemainingArguments = $true)] [string[]] $NameParts)
 $ErrorActionPreference = 'Stop'
@@ -11,7 +11,7 @@ if (-not $name) { $name = Read-Host 'Problem name' }
 $slug = ($name.ToLower() -replace '[^a-z0-9]+', '-').Trim('-')
 if (-not $slug) { Write-Error 'Invalid problem name'; exit 1 }
 
-$dir = Join-Path $root $slug
+$dir = Join-Path (Get-Location).Path $slug
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 if (Test-Path $dir) {
     Write-Host "'$slug' already exists, opening it."

@@ -10,7 +10,8 @@ the solution against `input.txt` without opening a terminal.
 $ new two-sum
 ```
 
-This creates a folder and opens it in a three-pane layout:
+This creates the folder in your **current directory** (so `cd problems/arrays && new two-sum`
+puts it in `problems/arrays/`) and opens it in a three-pane layout:
 
 ```
 +---------------------+---------------+

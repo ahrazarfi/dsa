@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Scaffold a new DSA problem folder and open it in VS Code.
+# Scaffold a new DSA problem folder in the current directory and open it in VS Code.
 # Usage: new.sh [problem-name]   (prompts if no name is given)
 set -euo pipefail
 
@@ -14,7 +14,7 @@ fi
 slug="$(echo "$name" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g')"
 [[ -n "$slug" ]] || { echo "Invalid problem name" >&2; exit 1; }
 
-dir="$ROOT/$slug"
+dir="$PWD/$slug"
 if [[ -e "$dir" ]]; then
   echo "'$slug' already exists, opening it."
 else
