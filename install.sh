@@ -6,15 +6,32 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VSIX="$ROOT/dist/dsa-layout-1.0.0.vsix"
 
-# 1. Python venv used by the run-current-python task
+# 1. uv (Python env manager), installed if missing
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+if ! command -v uv >/dev/null; then
+  echo "uv not found, installing it ..."
+  if command -v curl >/dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+  elif command -v wget >/dev/null; then
+    wget -qO- https://astral.sh/uv/install.sh | sh
+  else
+    echo "Need curl or wget to install uv. See https://docs.astral.sh/uv/" >&2
+    exit 1
+  fi
+  export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+  command -v uv >/dev/null || { echo "uv installed but not on PATH; open a new shell and rerun." >&2; exit 1; }
+fi
+echo "Using $(uv --version)"
+
+# 2. Python venv used by the run-current-python task
 if [[ ! -x "$ROOT/.venv/bin/python" ]]; then
   echo "Creating .venv ..."
-  python3 -m venv "$ROOT/.venv"
+  uv venv "$ROOT/.venv"
 else
   echo ".venv already exists."
 fi
 
-# 2. Layout extension
+# 3. Layout extension
 if command -v code >/dev/null; then
   echo "Installing the DSA Layout extension ..."
   code --install-extension "$VSIX" --force
