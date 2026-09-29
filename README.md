@@ -27,29 +27,69 @@ Edit `input.txt`, press **Ctrl+'**, read the result in `output.txt`.
 
 | File | Purpose |
 |---|---|
-| `solution.py` | A `Solution` class plus a small runner block. stdin/stdout are redirected to the two files below. |
-| `input.txt` | One Python literal per line, one line per argument (LeetCode style). |
-| `output.txt` | Whatever the solution prints. Git-ignored. |
+| `solution.py` | A `Solution` class plus one `run(...)` call. Paste just the class into LeetCode. |
+| `input.txt` | One value per line, one line per argument, LeetCode style. |
+| `expected.txt` | Optional. One value per test case. If present, the run is checked against it. |
+| `output.txt` | What your solution returned, for reading. Git-ignored. |
 
-Example `input.txt` for `rotateArray(nums, k)`:
+`solution.py` imports `run` from the `dsa` package (`dsa/` in this repo, installed into
+the venv by the install script), which does all the file handling, parsing, printing and
+checking. Rename `solve` to the method name and add its parameters.
+
+Example, `rotateArray(nums, k)`:
 
 ```
-[1, 2, 3, 4, 5]
+input.txt        expected.txt
+[1, 2, 3, 4, 5]  [3, 4, 5, 1, 2]
 2
 ```
 
-The runner in `solution.py` parses every non-empty line with `ast.literal_eval`,
-calls `Solution().<method>(*args)`, and prints the return value. If the method returns
-`None` (in-place problems) it prints the first argument instead. Lists print
-space-separated. Rename `solve` to your method name and add its parameters.
+```python
+from dsa import run
 
-Because the algorithm lives in the class and the runner is separate, you can paste
-just the class into LeetCode.
+class Solution:
+    def rotateArray(self, nums, k): ...
+
+if __name__ == '__main__':
+    run(Solution().rotateArray, in_place=True)
+```
+
+### How a run behaves
+
+- **Pass:** silent. `output.txt` holds the answer.
+- **Fail:** every failing case is printed with its input, the expected value and what it got,
+  and the script exits with an error. The run task reveals the terminal on a non-zero exit,
+  so failures pop up on their own.
+- **No `expected.txt`** (or an empty one): just run and write `output.txt`.
+- **Several test cases** in one file: separate them with a blank line in `input.txt`, and
+  put one line per case in `expected.txt`. All cases run, and all failures are reported.
+- **Input values** are read as JSON first (`null`, `true`), then Python literals, then as a
+  bare string, so `abcba` works unquoted. Quote a string that looks like a literal
+  (`"123"` stays a string, `123` is an int).
+- **Expected values** use the same syntax as input, so a matrix is `[[1,2],[3,4]]`.
+  `output.txt` shows it human-readably instead (one row per line).
+
+### `run()` options by problem type
+
+| Problem | Call |
+|---|---|
+| Ordinary function | `run(Solution().solve)` |
+| Edits its first argument, returns nothing | `run(..., in_place=True)`. A method that legitimately returns `None` needs no flag. |
+| Order of results doesn't matter (3Sum, Group Anagrams) | `run(..., unordered=True)`, sorts lists recursively before comparing |
+| Several valid answers | `run(..., check=lambda args, out: ...)`, verify instead of matching; `expected.txt` not needed |
+| Floating point answers | `run(..., tol=1e-5)` |
+| Linked list / tree arguments | `run(..., parse=[to_linked, None])` or `to_tree`; import them from `dsa`. `ListNode`/`TreeNode` results are converted back to lists automatically |
+| Design problems (LRUCache, MinStack) | `run_design(LRUCache)`. Line 1 of `input.txt` is the operations, line 2 the arguments; `expected.txt` is the results list with `null` |
+
+Not supported: interactive problems, Codeforces-style stdin, SQL. Adding a new structure
+or comparison mode means editing `dsa/` once; every problem gets it.
+
+Tests for the package: `.venv/bin/python -m unittest discover -s tests`.
 
 ## Pieces
 
 ### `new.sh` / `new.ps1`
-Two equivalent scripts, one per platform. Each scaffolds `<slug>/solution.py` (copied from `template/solution.py`), `input.txt`, `output.txt`. The name is slugified
+Two equivalent scripts, one per platform. Each scaffolds `<slug>/solution.py` (copied from `template/solution.py`), `input.txt`, `expected.txt`, `output.txt`. The name is slugified
 (`"Two Sum"` becomes `two-sum`); with no argument it prompts. If the folder already
 exists it just reopens it.
 
@@ -88,8 +128,8 @@ git clone git@github.com:ahrazarfi/dsa.git; cd dsa
 powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
-The install script installs uv if needed, creates `.venv` with `uv venv`, and installs
-the layout extension (`code --install-extension dist/dsa-layout-1.0.0.vsix`; if `code`
+The install script installs uv if needed, creates `.venv` with `uv venv`, installs the
+`dsa` package into it (`uv pip install -e .`), and installs the layout extension (`code --install-extension dist/dsa-layout-1.0.0.vsix`; if `code`
 isn't on PATH, the bash script copies it into the extensions folder and the PowerShell
 script tells you to use *Extensions: Install from VSIX...*). It then prints the two
 lines you still add by hand:
@@ -118,7 +158,7 @@ inside WSL, so the extension goes into the VS Code server.
 
 ### Manual setup
 
-1. `uv venv .venv`
+1. `uv venv .venv`, then `uv pip install -e . -C editable_mode=compat`
 2. The `new` command, as above.
 3. In VS Code run *Extensions: Install from VSIX...* and pick `dist/dsa-layout-1.0.0.vsix`.
 4. The keybinding, as above.
@@ -134,6 +174,9 @@ cd tools/dsa-layout && npx @vscode/vsce package --out ../../dist/dsa-layout-1.0.
 ```
 new.sh / new.ps1     scaffold command (bash / PowerShell)
 install.sh / .ps1    one-time setup (bash / PowerShell)
+dsa/                 the Python package solutions import (run, list/tree helpers)
+tests/               tests for dsa/
+pyproject.toml       makes dsa/ installable into the venv
 template/solution.py the file every new problem starts from
 dist/                packaged .vsix of the extension
 tools/dsa-layout/    VS Code layout extension

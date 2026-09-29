@@ -25,7 +25,10 @@ if (-not (Test-Path (Join-Path $root '.venv\Scripts\python.exe'))) {
     Write-Host '.venv already exists.'
 }
 
-# 3. Layout extension
+# 3. The dsa package (run(), list/tree helpers) used by every solution.py
+uv pip install -e $root --python (Join-Path $root '.venv\Scripts\python.exe') -C editable_mode=compat
+
+# 4. Layout extension
 if (Get-Command code -ErrorAction SilentlyContinue) {
     Write-Host 'Installing the DSA Layout extension ...'
     & code --install-extension $vsix --force

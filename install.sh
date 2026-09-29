@@ -31,7 +31,10 @@ else
   echo ".venv already exists."
 fi
 
-# 3. Layout extension
+# 3. The dsa package (run(), list/tree helpers) used by every solution.py
+uv pip install -e "$ROOT" --python "$ROOT/.venv/bin/python" -C editable_mode=compat
+
+# 4. Layout extension
 if command -v code >/dev/null; then
   echo "Installing the DSA Layout extension ..."
   code --install-extension "$VSIX" --force

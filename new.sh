@@ -21,6 +21,7 @@ else
   mkdir -p "$dir"
   cp "$ROOT/template/solution.py" "$dir/solution.py"
   : > "$dir/input.txt"
+  : > "$dir/expected.txt"
   : > "$dir/output.txt"
   echo "Created $dir"
 fi

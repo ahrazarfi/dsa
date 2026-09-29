@@ -20,6 +20,7 @@ if (Test-Path $dir) {
     $template = [System.IO.File]::ReadAllText((Join-Path $root 'template\solution.py')) -replace "`r`n", "`n"
     [System.IO.File]::WriteAllText((Join-Path $dir 'solution.py'), $template, $utf8)
     [System.IO.File]::WriteAllText((Join-Path $dir 'input.txt'), '', $utf8)
+    [System.IO.File]::WriteAllText((Join-Path $dir 'expected.txt'), '', $utf8)
     [System.IO.File]::WriteAllText((Join-Path $dir 'output.txt'), '', $utf8)
     Write-Host "Created $dir"
 }
