@@ -1,0 +1,4 @@
+.venv/
+.open-request
+__pycache__/
+output.txt
