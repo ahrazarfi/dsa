@@ -70,22 +70,30 @@ Problems panel.
 
 ## Setup
 
-1. **Python venv** in the repo root:
-   ```
-   python3 -m venv .venv
-   ```
-2. **Alias**, in `~/.zshrc` (adjust the path):
-   ```
-   alias new='~/dsa/new.sh'
-   ```
-3. **Extension.** Copy it into the VS Code extensions folder and reload the window.
-   For WSL / Remote it is the server's folder:
-   ```
-   cp -r tools/dsa-layout ~/.vscode-server/extensions/local.dsa-layout-1.0.0
-   ```
-   (locally it is `~/.vscode/extensions/`). Then run *Developer: Reload Window*.
-   Open the `dsa` folder as the workspace, since the extension watches the workspace root.
-4. **Shortcut.** In VS Code's `keybindings.json` (*Preferences: Open Keyboard Shortcuts (JSON)*):
+Quick way:
+
+```
+git clone git@github.com:ahrazarfi/dsa.git && cd dsa
+./install.sh
+```
+
+`install.sh` creates `.venv`, installs the layout extension (via
+`code --install-extension dist/dsa-layout-1.0.0.vsix`, or by copying it into the
+extensions folder if `code` isn't on PATH), and prints the two lines you still add by
+hand (the alias and the shortcut). Then reload VS Code and open the repo folder as the
+workspace, since the extension watches the workspace root.
+
+Needs bash, so Linux, macOS or WSL. On WSL run the script inside WSL and the extension
+goes into the server, not the Windows side. `tasks.json` points at `.venv/bin/python`;
+on native Windows you'd change it to `.venv\Scripts\python.exe`.
+
+### Manual setup
+
+1. `python3 -m venv .venv`
+2. Alias in `~/.zshrc`: `alias new='~/dsa/new.sh'`
+3. Extension: in VS Code run *Extensions: Install from VSIX...* and pick
+   `dist/dsa-layout-1.0.0.vsix`, then *Developer: Reload Window*.
+4. Shortcut, in `keybindings.json`:
    ```json
    {
        "key": "ctrl+'",
@@ -96,10 +104,18 @@ Problems panel.
    On some keyboard layouts VS Code stores the key as `ctrl+oem_7`.
 5. `code` must be on your PATH (it is inside a VS Code terminal) for the fallback.
 
+### Rebuilding the extension
+
+```
+cd tools/dsa-layout && npx @vscode/vsce package --out ../../dist/dsa-layout-1.0.0.vsix
+```
+
 ## Layout
 
 ```
 new.sh               scaffold command
+install.sh           one-time setup
+dist/                packaged .vsix of the extension
 tools/dsa-layout/    VS Code layout extension
 .vscode/tasks.json   run-current-python task
 <problem-slug>/      one folder per problem
