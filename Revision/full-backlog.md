@@ -3,7 +3,7 @@
 **Repo:** [ahrazarfi/dsa](https://github.com/ahrazarfi/dsa)  
 **Scope:** every problem under `PROBLEMS/Arrays` as of 2026-10-02  
 **Solved:** 15 · **Incomplete:** 1 (`two-sum`)  
-**Includes:** 2026-10-02 push — `interesection-two-sorted-arr` (repo root)  
+**Includes:** 2026-10-02 push — `interesection-two-sorted-arr` (under `PROBLEMS/Arrays/`)  
 
 ---
 
@@ -975,7 +975,7 @@ XOR sketch (same example): XOR everything in `0..5` with everything in nums → 
 
 ## 15. `interesection-two-sorted-arr`
 
-**Path:** `interesection-two-sorted-arr/solution.py`  
+**Path:** `PROBLEMS/Arrays/interesection-two-sorted-arr/solution.py`  
 **Status:** solved (real logic, not a stub)  
 **Related backlog problem:** `PROBLEMS/Arrays/union-two-sorted-arr`
 
@@ -1068,7 +1068,7 @@ Notice: the second `2` in `nums1` never finds a partner (only one `2` in `nums2`
 4. **Assuming no duplicates** — your tests deliberately include repeats (`2`, `3`); the algorithm must handle them.
 5. **Empty array** — one empty input ⇒ empty intersection immediately (while never runs).
 6. **Unsorted input** — this pointer logic is incorrect unless you sort first (sorting costs `O(n log n + m log m)` then `O(n + m)` merge).
-7. **Repo hygiene:** folder typo `interesection-…`; empty `expected.txt`; path outside `PROBLEMS/Arrays/` — none change the pattern, but worth fixing so tooling and future-you stay consistent.
+7. **Repo hygiene:** folder typo `interesection-…`; empty `expected.txt` — none change the pattern, but worth fixing so tooling and future-you stay consistent.
 
 ### Complexity
 
@@ -1141,7 +1141,7 @@ Yesterday’s backlog trained the **merge family** via union. Today’s commit f
 
 *One new problem, one deep pattern upgrade. Fill `expected.txt`, fix the folder typo when you tidy, then keep stacking.*
 
-> **Layout note:** folder is at repo root (`interesection-two-sorted-arr/`), not under `PROBLEMS/Arrays/`. Same pattern family as `union-two-sorted-arr` — opposite emit rule.
+> **Layout note:** lives under `PROBLEMS/Arrays/interesection-two-sorted-arr/` (moved from repo root on 2026-10-02). Same pattern family as `union-two-sorted-arr` — opposite emit rule.
 
 # Part II — Incomplete preview
 
@@ -1267,7 +1267,7 @@ While scanning, each value `x` asks whether `target − x` was already seen. The
 
 1. **`two-sum` unfinished** — highest leverage next solve for hash-map patterns.
 2. **Only `PROBLEMS/Arrays` exists** — no strings / linked lists / trees / recursion / DP folders yet; this pack covers 100% of what’s in the repo.
-3. **Empty `expected.txt`** on several solved folders (`find-missing-number`, `left-rotate-array-by-k`, `move-zeros-end`, `remove-duplicates-sorted-arr`, `union-two-sorted-arr`, plus stub `two-sum`, and root `interesection-two-sorted-arr`) — solutions look complete, but automated `dsa check` may not verify until expecteds are filled.
+3. **Empty `expected.txt`** on several solved folders (`find-missing-number`, `left-rotate-array-by-k`, `move-zeros-end`, `remove-duplicates-sorted-arr`, `union-two-sorted-arr`, plus stub `two-sum`, and `interesection-two-sorted-arr`) — solutions look complete, but automated `dsa check` may not verify until expecteds are filled.
 4. **`remove-duplicates-sorted-arr` return shape** — returns a slice; interviews/LeetCode often want integer `k`. Know both.
 
 ---

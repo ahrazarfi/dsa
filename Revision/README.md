@@ -4,17 +4,20 @@ Pattern-first DSA revision packs for this repo.
 
 ## How to use
 
-1. Open [`full-backlog.md`](./full-backlog.md).
+1. Prefer today’s dated pack if one exists; otherwise open [`full-backlog.md`](./full-backlog.md).
 2. Cover the quiz cards first — answer out loud before reading the Back.
 3. Then read tip-offs → pattern → approach skeleton.
 4. Walk the worked example with the state table covered; rebuild it yourself.
 5. Do **not** open `solution.py` while revising. Compare structure only after you force a skeleton from memory.
 6. Goal: recognize patterns on unfamiliar prompts — not memorize code.
 
-## What’s in the backlog
+## Daily packs
 
-- Every solved Arrays problem under `PROBLEMS/Arrays/`
-- Plus `interesection-two-sorted-arr/` at the repo root (2026-10-02)
-- Preview notes for unfinished `two-sum`
+| Date (IST) | File | Focus |
+|------------|------|--------|
+| 2026-10-03 | [`2026-10-03.md`](./2026-10-03.md) | `interesection-two-sorted-arr` — sorted two-pointer **intersection** (vs union) |
 
-Daily 9am packs can later land as dated files under this folder; for now the full backlog lives in `full-backlog.md`.
+## Full backlog
+
+- [`full-backlog.md`](./full-backlog.md) — every solved Arrays problem under `PROBLEMS/Arrays/` (15 solved + `two-sum` preview)
+- Includes the 2026-10-02 intersection solve (now under `PROBLEMS/Arrays/interesection-two-sorted-arr/`)
