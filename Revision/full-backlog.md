@@ -1,9 +1,9 @@
 # DSA Full Revision Pack — Pattern-First Interview Prep
 
 **Repo:** [ahrazarfi/dsa](https://github.com/ahrazarfi/dsa)  
-**Scope:** every problem under `PROBLEMS/Arrays` as of 2026-10-02  
-**Solved:** 15 · **Incomplete:** 1 (`two-sum`)  
-**Includes:** 2026-10-02 push — `interesection-two-sorted-arr` (under `PROBLEMS/Arrays/`)  
+**Scope:** every problem under `PROBLEMS/Arrays` as of 2026-10-04  
+**Solved:** 18 · **Incomplete:** 1 (`two-sum`)  
+**Includes:** 2026-10-03 push — `leaders-in-an-array`, `majority-element-i`, `rearrange-elements-by-sign`  
 
 ---
 
@@ -14,13 +14,13 @@
 3. **Walk the example with a blank sheet.** Cover the “state changing” column and rebuild it yourself.
 4. **Do not open `solution.py` while revising.** Re-open code only after you’ve forced a skeleton from memory — and even then, compare *structure*, not keystrokes.
 5. **Transfer test:** for each problem, invent one slightly different prompt (different constraint, same tip-off) and name the pattern. The quiz “variant” cards already nudge you there.
-6. **Suggested sitting:** 2–3 problems deeply, or skim tip-offs across all 15 then deep-dive weak patterns. Goal is recognition under interview pressure, not finishing the file in one gulp.
+6. **Suggested sitting:** 2–3 problems deeply, or skim tip-offs across the solved set then deep-dive weak patterns. Goal is recognition under interview pressure, not finishing the file in one gulp.
 
 **Tone reminder:** Interviewers care that you *see* the pattern and can narrate tradeoffs. Memorizing your exact Python is a trap.
 
 ---
 
-# Part I — Solved problems (15)
+# Part I — Solved problems (18)
 
 ---
 
@@ -1143,11 +1143,218 @@ Yesterday’s backlog trained the **merge family** via union. Today’s commit f
 
 > **Layout note:** lives under `PROBLEMS/Arrays/interesection-two-sorted-arr/` (moved from repo root on 2026-10-02). Same pattern family as `union-two-sorted-arr` — opposite emit rule.
 
+
+## 16. `leaders-in-an-array`
+
+**Path:** `PROBLEMS/Arrays/leaders-in-an-array/solution.py`
+
+### What it’s asking
+
+Return every **leader**: an element **strictly greater than all elements to its right**. The rightmost element is always a leader. Emit leaders in the **same left-to-right order** they appear in `nums`.
+
+Example: `[1, 2, 5, 3, 1, 2]` → `[5, 3, 2]`.
+
+### Tip-offs / how you’d recognize this
+
+- “Greater than all to the right” / “leaders”
+- Rightmost is free → think from the **right**
+- Output must preserve original order (not discovery order)
+- Not “next greater” (stack) and not “local max vs neighbors”
+
+### Pattern name(s) + why
+
+**Right-to-left scan with a running suffix maximum.**  
+Leader ⟺ strictly greater than `max(right suffix)`. Maintain `max_right` while walking left; on a strict win, record and update. Reverse the discovery list to restore left→right order.
+
+### Approach skeleton
+
+1. `max_right = nums[n−1]`, `result = [max_right]`.
+2. For `i` from `n−2` down to `0`: if `nums[i] > max_right`, append and set `max_right = nums[i]`.
+3. Reverse `result` and return.
+
+### Concrete example (state changing)
+
+Input: `nums = [1, 2, 5, 3, 1, 2]`
+
+| Step | `i` | `nums[i]` | `max_right` before | Leader? | `result` (discovery) | `max_right` after |
+|------|-----|-----------|--------------------|---------|----------------------|-------------------|
+| init | 5 | 2 | — | yes | `[2]` | 2 |
+| 1 | 4 | 1 | 2 | no | `[2]` | 2 |
+| 2 | 3 | 3 | 2 | yes | `[2, 3]` | 3 |
+| 3 | 2 | 5 | 3 | yes | `[2, 3, 5]` | 5 |
+| 4 | 1 | 2 | 5 | no | `[2, 3, 5]` | 5 |
+| 5 | 0 | 1 | 5 | no | `[2, 3, 5]` | 5 |
+
+Reverse → `[5, 3, 2]`.
+
+### Common pitfalls / edge cases
+
+1. Using `≥` instead of `>` (ties to the right are not leaders).
+2. Forgetting the final reverse.
+3. Left-to-right nested loops → O(n²); interviews want the O(n) suffix max.
+4. Single element → `[nums[0]]`; strictly increasing → only last; strictly decreasing → everyone.
+
+### Complexity
+
+- **Time:** O(n)  
+- **Space:** O(k) output; O(1) extra beyond the result list
+
+### Quiz cards
+
+**Front 1:** Why right-to-left instead of “for each i, scan i+1..n−1”?  
+**Back 1:** Nested scans are O(n²). A running suffix max collapses “all to the right” into O(1) per index.
+
+**Front 2:** Leaders in `[4, 4, 4]`?  
+**Back 2:** Only the last `4` — earlier equals are not *strictly* greater than the suffix max.
+
+**Front 3 (variant):** Return leaders in decreasing value order.  
+**Back 3:** Discovery order (right→left) already emits decreasing values; skip the reverse.
+
+---
+
+## 17. `majority-element-i`
+
+**Path:** `PROBLEMS/Arrays/majority-element-i/solution.py`
+
+### What it’s asking
+
+Return the element that appears **more than `n/2` times**. The array is **guaranteed** to have a majority. Example: `[7, 0, 0, 1, 7, 7, 2, 7, 7]` → `7`.
+
+### Tip-offs / how you’d recognize this
+
+- “Majority” / “> n/2” / “guaranteed to exist”
+- O(1) space follow-up → voting / cancelation
+- Contrast: “> n/3” needs up to two candidates; “no guarantee” needs a verify pass
+
+### Pattern name(s) + why
+
+**Boyer–Moore majority vote.**  
+Maintain a `candidate` and a `count`. Matching votes increment; mismatches cancel. When count hits 0, adopt the next value. A true majority (> n/2) cannot be fully canceled, so the final candidate is the answer under the guarantee.
+
+Hash-map counting is correct but O(n) space; sorting and picking the median is correct under the guarantee at O(n log n).
+
+### Approach skeleton
+
+1. `candidate = none`, `count = 0`.
+2. For each `x`: if `count == 0` → adopt `x` with `count = 1`; elif `x == candidate` → `count += 1`; else → `count -= 1`.
+3. Return `candidate` (add a counting verify pass if majority is not guaranteed).
+
+### Concrete example (state changing)
+
+Input: `nums = [7, 0, 0, 1, 7, 7, 2, 7, 7]`
+
+| Step | `x` | Action | `candidate` | `count` |
+|------|-----|--------|-------------|---------|
+| 1 | 7 | adopt | 7 | 1 |
+| 2 | 0 | cancel | 7 | 0 |
+| 3 | 0 | adopt | 0 | 1 |
+| 4 | 1 | cancel | 0 | 0 |
+| 5 | 7 | adopt | 7 | 1 |
+| 6 | 7 | same | 7 | 2 |
+| 7 | 2 | cancel | 7 | 1 |
+| 8 | 7 | same | 7 | 2 |
+| 9 | 7 | same | 7 | 3 |
+
+→ `7`
+
+### Common pitfalls / edge cases
+
+1. Forgetting to adopt when `count == 0`.
+2. Treating voting as valid without a guarantee — always verify when unsure.
+3. Confusing `> n/2` with `≥ n/2`.
+4. Off-by-one init (adopting `nums[0]` then also counting it twice).
+
+### Complexity
+
+- **Time:** O(n)  
+- **Space:** O(1)
+
+### Quiz cards
+
+**Front 1:** Why can’t a non-majority survive when a true majority exists?  
+**Back 1:** Cancelations remove majority and non-majority together; majority has more than half the votes, so it remains.
+
+**Front 2:** “More than n/3; up to two answers.” What changes?  
+**Back 2:** Two candidates + two counts; a third distinct value decrements both; then verify each with a count pass.
+
+**Front 3 (variant):** Majority not guaranteed. Extra step?  
+**Back 3:** Recount `candidate`; return only if count > n/2.
+
+---
+
+## 18. `rearrange-elements-by-sign`
+
+**Path:** `PROBLEMS/Arrays/rearrange-elements-by-sign/solution.py`
+
+### What it’s asking
+
+Even-length array with **equal** positives and negatives. Return a rearrangement that starts with a positive, alternates signs, and **preserves relative order** within each sign class.
+
+Example: `[2, 4, 5, -1, -3, -4]` → `[2, -1, 4, -3, 5, -4]`.
+
+### Tip-offs / how you’d recognize this
+
+- “Alternate +/−” + equal counts + start with positive
+- Stability within each sign
+- Positives land on even indices; negatives on odd
+- Unequal counts → interleave then append leftovers (variant)
+
+### Pattern name(s) + why
+
+**Two write pointers into even/odd slots.**  
+`pos` walks `0, 2, 4, …`; `neg` walks `1, 3, 5, …`. One read pass places each value into the next free slot of its sign. Encounter order keeps each class stable. (Two-list collect + interleave is the same pattern with explicit queues.)
+
+### Approach skeleton
+
+1. `result = [0]*n`, `pos = 0`, `neg = 1`.
+2. For each `x`: if `x > 0` → `result[pos] = x`, `pos += 2`; else → `result[neg] = x`, `neg += 2`.
+3. Return `result`.
+
+### Concrete example (state changing)
+
+Input: `nums = [2, 4, 5, -1, -3, -4]`
+
+| Step | `x` | Write idx | `result` after | `pos` | `neg` |
+|------|-----|-----------|----------------|-------|-------|
+| 1 | 2 | 0 | `[2,_,_,_,_,_]` | 2 | 1 |
+| 2 | 4 | 2 | `[2,_,4,_,_,_]` | 4 | 1 |
+| 3 | 5 | 4 | `[2,_,4,_,5,_]` | 6 | 1 |
+| 4 | −1 | 1 | `[2,-1,4,_,5,_]` | 6 | 3 |
+| 5 | −3 | 3 | `[2,-1,4,-3,5,_]` | 6 | 5 |
+| 6 | −4 | 5 | `[2,-1,4,-3,5,-4]` | 6 | 7 |
+
+→ `[2, -1, 4, -3, 5, -4]`
+
+### Common pitfalls / edge cases
+
+1. Starting negatives at index 0 when the prompt wants positive-first.
+2. Zeros — statement assumes strict +/−; clarify `> 0` vs `≥ 0`.
+3. Unequal counts — stop alternating and append the longer side.
+4. In-place swaps easily break relative order; prefer O(n) output array unless forced.
+
+### Complexity
+
+- **Time:** O(n)  
+- **Space:** O(n) for the result
+
+### Quiz cards
+
+**Front 1:** Why does `+= 2` on even/odd pointers force alternating signs?  
+**Back 1:** Evens reserved for `+`, odds for `−`. Filling those slots in encounter order *is* the alternate pattern.
+
+**Front 2:** Variant starts with a negative — what changes?  
+**Back 2:** Init `neg = 0`, `pos = 1`.
+
+**Front 3 (variant):** Unequal +/− counts.  
+**Back 3:** Collect two stable lists; interleave while both nonempty; extend with leftovers.
+
+---
+
 # Part II — Incomplete preview
 
 ---
 
-## 16. `two-sum` *(stub — not solved yet)*
+## 19. `two-sum` *(stub — not solved yet)*
 
 **Path:** `PROBLEMS/Arrays/two-sum/solution.py`  
 **Status:** `solve` is still `pass`; `input.txt` / `expected.txt` empty. Scaffold only.
@@ -1231,6 +1438,9 @@ While scanning, each value `x` asks whether `target − x` was already seen. The
 | Write pointer (unique compress) | Sorted; remove dups in place | `remove-duplicates-sorted-arr` | O(n)/O(1) | allow at most 2; remove element in place |
 | Two-pointer sorted merge + dedup | Two sorted arrays → sorted union | `union-two-sorted-arr` | O(n+m)/O(n+m) | intersection; merge sorted lists |
 | Sum / XOR gap in a range | Exactly one missing in 0..n | `find-missing-number` | O(n)/O(1) | find duplicate; find two missing |
+| Suffix max / right-to-left leaders | Strictly > all to the right | `leaders-in-an-array` | O(n)/O(k) | next greater (stack); suffix arrays of extrema |
+| Boyer–Moore majority vote | Element > n/2; O(1) space | `majority-element-i` | O(n)/O(1) | majority > n/3 (two candidates); verify pass |
+| Even/odd write pointers (sign rearrange) | Alternate +/−; preserve order | `rearrange-elements-by-sign` | O(n)/O(n) | unequal counts + remainder; Dutch-flag cousins |
 | Hash-map complement *(preview)* | Two indices sum to target | `two-sum` *(stub)* | O(n)/O(n) | 3Sum, two-sum variants, subarray sum equals k |
 
 ---
@@ -1269,7 +1479,8 @@ While scanning, each value `x` asks whether `target − x` was already seen. The
 2. **Only `PROBLEMS/Arrays` exists** — no strings / linked lists / trees / recursion / DP folders yet; this pack covers 100% of what’s in the repo.
 3. **Empty `expected.txt`** on several solved folders (`find-missing-number`, `left-rotate-array-by-k`, `move-zeros-end`, `remove-duplicates-sorted-arr`, `union-two-sorted-arr`, plus stub `two-sum`, and `interesection-two-sorted-arr`) — solutions look complete, but automated `dsa check` may not verify until expecteds are filled.
 4. **`remove-duplicates-sorted-arr` return shape** — returns a slice; interviews/LeetCode often want integer `k`. Know both.
+5. **2026-10-03 trio** — `leaders-in-an-array`, `majority-element-i`, `rearrange-elements-by-sign` solved; keep expecteds filled for `dsa check`.
 
 ---
 
-*You’ve built a solid Arrays foundation: scans → streaks → two pointers → write pointers → merge → math gap. Fill `two-sum`, then the same recognition muscles transfer hard into the next topic folders you add.*
+*You’ve built a solid Arrays foundation: scans → streaks → two pointers → write pointers → merge → math gap → suffix extrema → voting → parity slots. Fill `two-sum`, then the same recognition muscles transfer hard into the next topic folders you add.*

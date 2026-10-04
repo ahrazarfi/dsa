@@ -15,9 +15,10 @@ Pattern-first DSA revision packs for this repo.
 
 | Date (IST) | File | Focus |
 |------------|------|--------|
+| 2026-10-04 | [`2026-10-04.md`](./2026-10-04.md) | `leaders-in-an-array`, `majority-element-i`, `rearrange-elements-by-sign` — suffix max, Boyer–Moore, even/odd slots |
 | 2026-10-03 | [`2026-10-03.md`](./2026-10-03.md) | `interesection-two-sorted-arr` — sorted two-pointer **intersection** (vs union) |
 
 ## Full backlog
 
-- [`full-backlog.md`](./full-backlog.md) — every solved Arrays problem under `PROBLEMS/Arrays/` (15 solved + `two-sum` preview)
-- Includes the 2026-10-02 intersection solve (now under `PROBLEMS/Arrays/interesection-two-sorted-arr/`)
+- [`full-backlog.md`](./full-backlog.md) — every solved Arrays problem under `PROBLEMS/Arrays/` (18 solved + `two-sum` preview)
+- Includes the 2026-10-03 trio (`leaders-in-an-array`, `majority-element-i`, `rearrange-elements-by-sign`)
